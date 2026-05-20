@@ -7,10 +7,18 @@
     "dev": "tsx watch ./src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imranh-dev1/Dev_Pulse.git"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
+  "bugs": {
+    "url": "https://github.com/imranh-dev1/Dev_Pulse/issues"
+  },
+  "homepage": "https://github.com/imranh-dev1/Dev_Pulse#readme",
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.9.1",
@@ -18,6 +26,7 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "dotenv": "^17.4.2",
     "express": "^5.2.1"
   }
 }
