@@ -31,10 +31,34 @@ const createIssuesFromDB = async (issues: TIssue, reporterId: number) => {
     }
 }
 
-const getAllIssuesFromDB = async () => {
-    const allIssues = await pool.query(`
-        SELECT * FROM issues
-    `);
+const getAllIssuesFromDB = async (query: any) => {
+
+    const { sort, type, status } = query;
+
+    let sql = `SELECT * FROM issues WHERE 1=1`;
+
+    const values: any[] = [];
+    let count = 1;
+
+    if (type) {
+        sql += ` AND type = $${count}`;
+        values.push(type);
+        count++;
+    }
+
+    if (status) {
+        sql += ` AND status = $${count}`;
+        values.push(status);
+        count++;
+    }
+
+    if (sort === "oldest") {
+        sql += ` ORDER BY created_at ASC`;
+    } else {
+        sql += ` ORDER BY created_at DESC`;
+    }
+
+    const allIssues = await pool.query(sql, values);
 
     const reporterIds = allIssues.rows.map(
         (issue) => issue.reporter_id
