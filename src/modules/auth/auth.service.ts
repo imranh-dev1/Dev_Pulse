@@ -39,8 +39,10 @@ const singInUsersFromDB = async (payload: { email: string, password: string }) =
     if (result.rows.length === 0) {
         throw new Error("User not found...!")
     }
-     
+
     const user = result.rows[0];
+
+    // console.log(user)
 
     const matchPassword = await bcrypt.compare(password, user.password)
 

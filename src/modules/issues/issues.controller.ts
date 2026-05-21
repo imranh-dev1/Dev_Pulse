@@ -1,26 +1,24 @@
 import type { Request, Response } from "express";
+import { issuesService } from "./issues.service";
 
-const createIssue = (req: Request, res: Response) => {
+const createIssue = async (req: Request, res: Response) => {
+    const reporterId = req.user?.id;
     try {
-        console.log(req.body)
+        const result = await issuesService.createIssuesFromDB(req.body, reporterId)
 
-        res.status(200).json({
+        res.status(201).json({
             success: true,
-            message: "Created Issue successfully...!",
-            // data: result,
+            message: "Created Issue successfully!",
+            data: result
         });
-
-
 
     } catch (error: any) {
-
         res.status(500).json({
             success: false,
-            message: error.message,
-            error: error,
+            message: error.message
         });
     }
-}
+};
 
 export const issuesController = {
     createIssue,

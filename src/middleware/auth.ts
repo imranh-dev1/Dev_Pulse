@@ -1,27 +1,48 @@
 import type { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 import config from "../config";
+import { pool } from "../db";
 
-export const auth = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+const auth = () => {
 
-    const token = req.headers.authorization;
+    return async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const token = req.headers.authorization;
 
-    if (!token) {
-        res.status(401).json({
-            success: false,
-            message: "Unauthorized access"
-        });
+            // console.log(token)
+            // console.log(req.user)
 
-        return;
+            if (!token) {
+                res.status(401).json({
+                    success: false,
+                    message: "Unauthorized access"
+                });
+                return;
+            }
+
+            const decoded = jwt.verify(token, config.jwt_secret) as JwtPayload;
+
+            const usersData = await pool.query(`
+            SELECT * FROM users WHERE email=$1
+            `, [decoded.email]
+            )
+
+            if (usersData.rows.length === 0) {
+                res.status(404).json({
+                    success: false,
+                    message: "User not found..!"
+                });
+                return;
+            }
+
+            req.user = decoded;
+            next();
+        } catch (error) {
+            next(error)
+        }
     }
 
-    const decoded = jwt.verify(token, config.jwt_secret);
-
-    req.user = decoded;
-
-    next();
 };
+
+export default auth;
+
