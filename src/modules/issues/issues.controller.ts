@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { issuesService } from "./issues.service";
+import { pool } from "../../db";
 
 const createIssue = async (req: Request, res: Response) => {
     const reporterId = req.user?.id;
@@ -20,6 +21,27 @@ const createIssue = async (req: Request, res: Response) => {
     }
 };
 
+const getAllIssues = async (req: Request, res: Response) => {
+    try {
+
+        const result = await issuesService.getAllIssuesFromDB();
+
+        res.status(200).json({
+            success: true,
+            data: result
+        });
+
+    } catch (error: any) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
 export const issuesController = {
     createIssue,
+    getAllIssues
 }
