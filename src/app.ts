@@ -1,6 +1,10 @@
 import express, { type Application, type Request, type Response } from "express";
+import { authRoute } from "./modules/auth/auth.route";
+
 
 const app: Application = express()
+
+app.use(express.json())
 
 app.get('/', (req: Request, res: Response) => {
     res.send({
@@ -8,6 +12,8 @@ app.get('/', (req: Request, res: Response) => {
         description: "Internal Tech Issue & Feature Tracker, A collaborative platform for software teams to report bugs, suggest features, and coordinate resolutions."
     })
 })
+
+app.use("/api/auth", authRoute) 
 
 
 export default app;
