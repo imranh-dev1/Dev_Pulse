@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { authService } from "./auth.service";
 
 const signUpUsers = async (req: Request, res: Response) => {
-    console.log(req.body)
+    // console.log(req.body)
     try {
         const result = await authService.signUpUsersFromDB(req.body)
         res.status(201).json({

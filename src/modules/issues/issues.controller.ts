@@ -77,10 +77,28 @@ const updateSingleIssue = async (req: Request, res: Response) => {
     }
 }
 
+const deletedSingleIssue = async (req: Request, res: Response) => {
+    const id = req.params.id as string;
+    try {
+        const result = await issuesService.deletedSingleIssueFromBD(id)
+        // console.log(result)
+
+        res.status(200).json({
+            success: true,
+            message: "Issue deleted successfully"
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+}
 
 export const issuesController = {
     createIssue,
     getAllIssues,
     getSingleIssue,
-    updateSingleIssue
+    updateSingleIssue,
+    deletedSingleIssue
 }
