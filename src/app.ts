@@ -8,14 +8,14 @@ const app: Application = express()
 app.use(express.json())
 
 app.get('/', (req: Request, res: Response) => {
-    res.send({
+    res.status(200).send({
         server: "Dev_Pulse",
         description: "Internal Tech Issue & Feature Tracker, A collaborative platform for software teams to report bugs, suggest features, and coordinate resolutions."
     })
 })
 
-app.use("/api/auth", authRoute) 
-app.use("/api/issues", issuesRoute) 
+app.use("/api/auth", authRoute)
+app.use("/api/issues", issuesRoute)
 
 
 

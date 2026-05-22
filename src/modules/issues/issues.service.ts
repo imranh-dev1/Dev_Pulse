@@ -1,11 +1,12 @@
 import { pool } from "../../db";
+import attachReporterToIssues from "../../utils/issueWithReporter";
 import type { TIssue } from "./issues.interface";
 
 const createIssuesFromDB = async (issues: TIssue, reporterId: number) => {
     try {
         const { title, description, type } = issues;
 
-        console.log({ title, description, type })
+        // console.log({ title, description, type })
 
         const userExists = await pool.query(
             `SELECT * FROM users WHERE id = $1`,
@@ -77,6 +78,7 @@ const getAllIssuesFromDB = async (query: any) => {
         [reporterIds]
     );
 
+
     const issuesWithReporter = allIssues.rows.map((issue) => {
 
         const reporter = allReporterUsers.rows.find(
@@ -85,10 +87,9 @@ const getAllIssuesFromDB = async (query: any) => {
 
         const { reporter_id, ...rest } = issue;
 
-        return {
-            ...rest,
-            reporter
-        };
+        const retrieveIssuesData = attachReporterToIssues(rest, reporter);
+
+        return retrieveIssuesData;
     });
 
     return issuesWithReporter;
@@ -101,12 +102,27 @@ const getSingleIssueFromDB = async (id: string) => {
             `SELECT * FROM issues WHERE id=$1`,
             [id]
         );
-        // console.log(result.rows[0])
+
         if (result.rows.length === 0) {
             throw new Error("issue not found..!")
         }
-        delete result.rows[0].password;
-        return result.rows[0];
+
+        const reporterUser = await pool.query(`
+            SELECT id, name, role FROM users WHERE id = $1`,
+            [result.rows[0].reporter_id]
+        );
+
+        // console.log(result.rows, reporterUser.rows);
+
+        const issue = result.rows[0]
+        const reporter = reporterUser.rows[0]
+
+        // console.log(issue, reporter)
+
+        const retrieveIssuesData = attachReporterToIssues(issue, reporter)
+
+        return retrieveIssuesData;
+
     } catch (error: any) {
         throw new Error(error.message)
     }
@@ -135,7 +151,7 @@ const updateSingleIssueFromDB = async (id: string, payload: {
 const deletedSingleIssueFromBD = async (id: string) => {
     const result = await pool.query(`
         DELETE FROM issues WHERE id = $1 RETURNING *`
-        ,[id]
+        , [id]
     );
 
     if (result.rows.length === 0) {

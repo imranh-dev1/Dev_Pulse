@@ -1,6 +1,4 @@
-import type { NextFunction, Request, Response } from "express";
-import jwt, { type JwtPayload } from "jsonwebtoken";
-import config from "../config";
+import type { NextFunction, Request, Response } from "express"; 
 import { pool } from "../db";
 
 const checkIssuePermission = () => {

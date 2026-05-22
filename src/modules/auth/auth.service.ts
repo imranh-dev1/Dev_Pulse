@@ -1,6 +1,6 @@
 import config from "../../config";
 import { pool } from "../../db";
-import type { TUsers } from "./auth.users.interface";
+import type { TUsers } from "../../types/user";
 import bcrypt from "bcrypt"
 import jwt from 'jsonwebtoken'
 
