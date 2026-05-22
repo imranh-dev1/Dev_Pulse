@@ -98,7 +98,7 @@ const getSingleIssueFromDB = async (id: string) => {
     // console.log(id)
     try {
         const result = await pool.query(
-            `SELECT * FROM users WHERE id=$1`,
+            `SELECT * FROM issues WHERE id=$1`,
             [id]
         );
         // console.log(result.rows[0])
