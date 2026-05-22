@@ -9,9 +9,6 @@ const auth = () => {
         try {
             const token = req.headers.authorization;
 
-            // console.log(token)
-            // console.log(req.user)
-
             if (!token) {
                 res.status(401).json({
                     success: false,

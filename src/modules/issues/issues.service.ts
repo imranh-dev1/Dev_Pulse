@@ -112,8 +112,30 @@ const getSingleIssueFromDB = async (id: string) => {
     }
 }
 
+const updateSingleIssueFromDB = async (id: string, payload: {
+    title: string; description: string; type: string;
+}) => {
+
+    try {
+        const { title, description, type } = payload;
+        const result = await pool.query(`
+            UPDATE issues SET title = $1, description = $2,type = $3, updated_at = NOW() WHERE id = $4 RETURNING *
+        `,
+            [title, description, type, id]
+        );
+
+        return result.rows[0];
+
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+
+}
+
+
 export const issuesService = {
     createIssuesFromDB,
     getAllIssuesFromDB,
-    getSingleIssueFromDB
+    getSingleIssueFromDB,
+    updateSingleIssueFromDB
 }
