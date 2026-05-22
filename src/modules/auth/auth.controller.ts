@@ -6,7 +6,7 @@ const signUpUsers = async (req: Request, res: Response) => {
     try {
         const result = await authService.signUpUsersFromDB(req.body)
 
-        sendResponse(res, 201, true, "User registered successfully", result)
+        sendResponse(res, 201, true, "User registered successfully", result.rows[0])
 
     } catch (error: any) {
         res.status(500).json({

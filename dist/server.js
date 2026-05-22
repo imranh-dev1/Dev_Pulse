@@ -109,15 +109,21 @@ var authService = {
   singInUsersFromDB
 };
 
+// src/utils/sendResponse.ts
+var sendResponse = (res, statusCode, success, message, data) => {
+  res.status(statusCode).json({
+    success,
+    message,
+    data
+  });
+};
+var sendResponse_default = sendResponse;
+
 // src/modules/auth/auth.controller.ts
 var signUpUsers = async (req, res) => {
   try {
     const result = await authService.signUpUsersFromDB(req.body);
-    res.status(201).json({
-      "success": true,
-      "message": "User registered successfully",
-      "data": result.rows[0]
-    });
+    sendResponse_default(res, 201, true, "User registered successfully", result.rows[0]);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -130,11 +136,7 @@ var signUpUsers = async (req, res) => {
 var signInUsers = async (req, res) => {
   try {
     const result = await authService.singInUsersFromDB(req.body);
-    res.status(200).json({
-      success: true,
-      message: "User signIn successfully...!",
-      data: result
-    });
+    sendResponse_default(res, 200, true, "User signIn successfully...!", result);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -157,11 +159,30 @@ var authRoute = router;
 // src/modules/issues/issues.route.ts
 import { Router as Router2 } from "express";
 
+// src/utils/issueWithReporter.ts
+var attachReporterToIssue = (issue, reporter) => {
+  const retrieveIssuesData = {
+    id: issue.id,
+    title: issue.title,
+    description: issue.description,
+    type: issue.type,
+    status: issue.status,
+    reporter: {
+      id: reporter.id,
+      name: reporter.name,
+      role: reporter.role
+    },
+    created_at: issue.created_at,
+    updated_at: issue.updated_at
+  };
+  return retrieveIssuesData;
+};
+var issueWithReporter_default = attachReporterToIssue;
+
 // src/modules/issues/issues.service.ts
 var createIssuesFromDB = async (issues, reporterId) => {
   try {
     const { title, description, type } = issues;
-    console.log({ title, description, type });
     const userExists = await pool.query(
       `SELECT * FROM users WHERE id = $1`,
       [reporterId]
@@ -221,10 +242,8 @@ var getAllIssuesFromDB = async (query) => {
       (user) => user.id === issue.reporter_id
     );
     const { reporter_id, ...rest } = issue;
-    return {
-      ...rest,
-      reporter
-    };
+    const retrieveIssuesData = issueWithReporter_default(rest, reporter);
+    return retrieveIssuesData;
   });
   return issuesWithReporter;
 };
@@ -237,8 +256,15 @@ var getSingleIssueFromDB = async (id) => {
     if (result.rows.length === 0) {
       throw new Error("issue not found..!");
     }
-    delete result.rows[0].password;
-    return result.rows[0];
+    const reporterUser = await pool.query(
+      `
+            SELECT id, name, role FROM users WHERE id = $1`,
+      [result.rows[0].reporter_id]
+    );
+    const issue = result.rows[0];
+    const reporter = reporterUser.rows[0];
+    const retrieveIssuesData = issueWithReporter_default(issue, reporter);
+    return retrieveIssuesData;
   } catch (error) {
     throw new Error(error.message);
   }
@@ -266,7 +292,7 @@ var deletedSingleIssueFromBD = async (id) => {
   if (result.rows.length === 0) {
     throw new Error("Issue not found");
   }
-  return result.rows[0];
+  return;
 };
 var issuesService = {
   createIssuesFromDB,
@@ -281,11 +307,7 @@ var createIssue = async (req, res) => {
   const reporterId = req.user?.id;
   try {
     const result = await issuesService.createIssuesFromDB(req.body, reporterId);
-    res.status(201).json({
-      success: true,
-      message: "Created Issue successfully!",
-      data: result
-    });
+    sendResponse_default(res, 201, true, "Issue created successfully!", result);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -296,10 +318,7 @@ var createIssue = async (req, res) => {
 var getAllIssues = async (req, res) => {
   try {
     const result = await issuesService.getAllIssuesFromDB(req.query);
-    res.status(200).json({
-      success: true,
-      data: result
-    });
+    sendResponse_default(res, 200, true, "All issues caught successfully!", result);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -311,10 +330,7 @@ var getSingleIssue = async (req, res) => {
   try {
     const { id } = req.params;
     const result = await issuesService.getSingleIssueFromDB(id);
-    res.status(200).json({
-      success: true,
-      data: result
-    });
+    sendResponse_default(res, 200, true, "Single issue caught successfully!", result);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -327,11 +343,7 @@ var updateSingleIssue = async (req, res) => {
   const updatedPayload = req.body;
   try {
     const result = await issuesService.updateSingleIssueFromDB(id, updatedPayload);
-    res.status(200).json({
-      success: true,
-      message: "Issue updated successfully",
-      data: result
-    });
+    sendResponse_default(res, 200, true, "Issue updated successfully.!", result);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -343,10 +355,7 @@ var deletedSingleIssue = async (req, res) => {
   const id = req.params.id;
   try {
     const result = await issuesService.deletedSingleIssueFromBD(id);
-    res.status(200).json({
-      success: true,
-      message: "Issue deleted successfully"
-    });
+    sendResponse_default(res, 200, true, "Issue deleted successfully.!", result);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -399,7 +408,6 @@ var auth = () => {
 var auth_default = auth;
 
 // src/middleware/checkIssuePermission.ts
-import "jsonwebtoken";
 var checkIssuePermission = () => {
   return async (req, res, next) => {
     try {
@@ -462,7 +470,7 @@ var issuesRoute = router2;
 var app = express();
 app.use(express.json());
 app.get("/", (req, res) => {
-  res.send({
+  res.status(200).send({
     server: "Dev_Pulse",
     description: "Internal Tech Issue & Feature Tracker, A collaborative platform for software teams to report bugs, suggest features, and coordinate resolutions."
   });

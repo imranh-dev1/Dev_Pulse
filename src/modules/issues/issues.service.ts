@@ -158,7 +158,7 @@ const deletedSingleIssueFromBD = async (id: string) => {
         throw new Error("Issue not found");
     }
 
-    return result.rows[0];
+    return;
 }
 
 export const issuesService = {
