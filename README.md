@@ -4,7 +4,7 @@ Internal Tech Issue & Feature Tracker API built with Node.js, Express.js, TypeSc
 
 ---
 
-## 🚀 Live URL
+## 🌐 Live URL
 
 Backend URL here:
 
