@@ -9,7 +9,7 @@ Internal Tech Issue & Feature Tracker API built with Node.js, Express.js, TypeSc
 Backend URL here:
 
 ```bash
-https://your-live-api-url.com
+https://live-api-url.com
 ```
 
 ---
@@ -19,7 +19,7 @@ https://your-live-api-url.com
 GitHub repository link here:
 
 ```bash
-[https://github.com/yourusername/devpulse](https://github.com/imranh-dev1/Dev_Pulse)
+https://github.com/imranh-dev1/Dev_Pulse
 ```
 
 ---
