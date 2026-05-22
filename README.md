@@ -9,7 +9,7 @@ Internal Tech Issue & Feature Tracker API built with Node.js, Express.js, TypeSc
 Backend URL here:
 
 ```bash
-https://live-api-url.com
+https://dev-pulse-plum.vercel.app/
 ```
 
 ---
