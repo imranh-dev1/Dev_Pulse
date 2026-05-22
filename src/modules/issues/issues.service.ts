@@ -94,7 +94,26 @@ const getAllIssuesFromDB = async (query: any) => {
     return issuesWithReporter;
 };
 
+const getSingleIssueFromDB = async (id: string) => {
+    // console.log(id)
+    try {
+        const result = await pool.query(
+            `SELECT * FROM users WHERE id=$1`,
+            [id]
+        );
+        // console.log(result.rows[0])
+        if (result.rows.length === 0) {
+            throw new Error("issue not found..!")
+        }
+        delete result.rows[0].password;
+        return result.rows[0];
+    } catch (error: any) {
+        throw new Error(error.message)
+    }
+}
+
 export const issuesService = {
     createIssuesFromDB,
-    getAllIssuesFromDB
+    getAllIssuesFromDB,
+    getSingleIssueFromDB
 }
